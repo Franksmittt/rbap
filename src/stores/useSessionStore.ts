@@ -6,12 +6,13 @@ interface SessionState {
   lastSelectedNumber: number | null; // Last number clicked on the table
   selectedNumbersHistory: number[]; // History of all selected numbers (for tags/neighbors display)
   addSpin: (number: number) => void;
+  setSpinHistory: (history: number[]) => void; // For syncing from peer
   clearHistory: () => void;
   undoLastSpin: () => void;
   redoLastSpin: () => void;
 }
 
-const MAX_HISTORY_LENGTH = 150;
+const MAX_HISTORY_LENGTH = 50; // Keep last 50 numbers as requested
 
 export const useSessionStore = create<SessionState>((set, get) => ({
   spinHistory: [],
@@ -29,7 +30,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       // Add new number
       newHistory = [...newHistory, number];
       
-      // Keep only the last 150 spins
+      // Keep only the last 50 numbers
       if (newHistory.length > MAX_HISTORY_LENGTH) {
         newHistory = newHistory.slice(-MAX_HISTORY_LENGTH);
       }
@@ -44,6 +45,16 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         selectedNumbersHistory: newSelectedHistory,
       };
     }),
+  setSpinHistory: (history: number[]) => {
+    // Only keep last 50 numbers as requested
+    const limitedHistory = history.slice(-50);
+    set({
+      spinHistory: limitedHistory,
+      historyPointer: -1,
+      lastSelectedNumber: limitedHistory.length > 0 ? limitedHistory[limitedHistory.length - 1] : null,
+      selectedNumbersHistory: limitedHistory,
+    });
+  },
   clearHistory: () => set({ spinHistory: [], historyPointer: -1, lastSelectedNumber: null, selectedNumbersHistory: [] }),
   undoLastSpin: () =>
     set((state) => {

@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useEntityStore } from '@/stores/useEntityStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { getRouletteColor } from '@/utils/rouletteColors';
+import { playAlertSound } from '@/utils/soundNotification';
 
 export default function EntityNotifications() {
   const entities = useEntityStore((state) => state.entities);
@@ -13,6 +14,7 @@ export default function EntityNotifications() {
   const processSpinHistory = useEntityStore((state) => state.processSpinHistory);
   const spinHistory = useSessionStore((state) => state.spinHistory);
   const isInitialized = useEntityStore((state) => state.isInitialized);
+  const previousAlertCountRef = useRef(0);
 
   // Initialize entities on mount
   useEffect(() => {
@@ -36,6 +38,16 @@ export default function EntityNotifications() {
       (entity) => entity.score <= 6 && entity.lastSeenAgo >= entity.threshold
     );
   }, [entities]);
+
+  // Play sound when new alerts appear
+  useEffect(() => {
+    const currentAlertCount = activeAlerts.length;
+    if (currentAlertCount > previousAlertCountRef.current && currentAlertCount > 0) {
+      // New alert appeared - play screaming sound
+      playAlertSound();
+    }
+    previousAlertCountRef.current = currentAlertCount;
+  }, [activeAlerts.length]);
 
   // Sort alerts by score (lowest first = most pinpointed) then by gap (highest first)
   const sortedAlerts = [...activeAlerts].sort((a, b) => {
