@@ -17,6 +17,7 @@ export default function DataSync({ currentUser }: DataSyncProps) {
   const [peerId, setPeerId] = useState<string>('');
   const [remotePeerId, setRemotePeerId] = useState<string>('');
   const [isHost, setIsHost] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const peerRef = useRef<any>(null);
   const dataChannelRef = useRef<RTCDataChannel | null>(null);
   const lastSyncedLengthRef = useRef(0);
@@ -197,11 +198,23 @@ export default function DataSync({ currentUser }: DataSyncProps) {
   };
 
   return (
-    <div className="fixed top-4 left-4 bg-white rounded-lg shadow-lg border-2 border-gray-300 p-4 z-50 max-w-sm">
-      <h3 className="font-bold text-gray-800 mb-3">Data Sync & Export</h3>
+    <div className="fixed top-4 left-4 bg-white rounded-lg shadow-lg border-2 border-gray-300 z-50 max-w-sm">
+      {/* Header with minimize button */}
+      <div className="bg-blue-600 text-white px-4 py-2 rounded-t-lg flex items-center justify-between">
+        <h3 className="font-bold">Data Sync & Export</h3>
+        <button
+          onClick={() => setIsMinimized(!isMinimized)}
+          className="text-white hover:bg-blue-700 rounded px-2 py-1 transition-colors"
+          title={isMinimized ? 'Expand' : 'Minimize'}
+        >
+          {isMinimized ? '▲' : '▼'}
+        </button>
+      </div>
       
-      {/* WebRTC Connection */}
-      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+      {!isMinimized && (
+        <div className="p-4">
+          {/* WebRTC Connection */}
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
         <div className="mb-2">
           <p className="text-xs text-gray-600 mb-1">Your ID (share this):</p>
           <div className="flex gap-2">
@@ -263,24 +276,26 @@ export default function DataSync({ currentUser }: DataSyncProps) {
         </div>
       </div>
 
-      {/* Import/Export */}
-      <div className="space-y-2">
-        <button
-          onClick={handleExport}
-          className="w-full px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
-        >
-          📥 Export Numbers
-        </button>
-        <label className="block w-full px-3 py-2 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors text-center cursor-pointer">
-          📤 Import Numbers
-          <input
-            type="file"
-            accept=".json"
-            onChange={handleImport}
-            className="hidden"
-          />
-        </label>
-      </div>
+          {/* Import/Export */}
+          <div className="space-y-2">
+            <button
+              onClick={handleExport}
+              className="w-full px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+            >
+              📥 Export Numbers
+            </button>
+            <label className="block w-full px-3 py-2 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors text-center cursor-pointer">
+              📤 Import Numbers
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImport}
+                className="hidden"
+              />
+            </label>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
