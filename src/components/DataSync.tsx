@@ -56,7 +56,7 @@ export default function DataSync({ currentUser }: DataSyncProps) {
             }
           });
 
-          conn.on('data', (data) => {
+          conn.on('data', (data: unknown) => {
             try {
               const message = JSON.parse(data as string);
               if (message.type === 'spin') {
@@ -132,7 +132,7 @@ export default function DataSync({ currentUser }: DataSyncProps) {
       }
     });
 
-    conn.on('data', (data) => {
+    conn.on('data', (data: unknown) => {
       try {
         const message = JSON.parse(data as string);
         if (message.type === 'spin') {
