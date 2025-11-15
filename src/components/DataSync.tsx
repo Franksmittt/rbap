@@ -84,7 +84,7 @@ export default function DataSync({ currentUser }: DataSyncProps) {
           });
         });
 
-        peer.on('error', (err) => {
+        peer.on('error', (err: Error) => {
           console.error('Peer error:', err);
           setConnectionStatus('disconnected');
         });
@@ -157,7 +157,7 @@ export default function DataSync({ currentUser }: DataSyncProps) {
       setDataChannel(null);
     });
 
-    conn.on('error', (err) => {
+    conn.on('error', (err: Error) => {
       console.error('Connection error:', err);
       setConnectionStatus('disconnected');
     });
